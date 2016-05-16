@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "logo-baidu-disabled.png",
+      "filename" : "icon-status-item.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "logo-baidu-disabled@2x.png",
+      "filename" : "icon-status-item@2x.png",
       "scale" : "2x"
     },
     {

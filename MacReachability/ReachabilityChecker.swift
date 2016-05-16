@@ -8,21 +8,59 @@
 
 import Cocoa
 
+enum ReachabilityCheckerStatus {
+    case Pending
+    case Failed
+    case Succeed
+    case Cancelled
+}
+
+
 class ReachabilityChecker: NSObject {
 
-    class func checkInBackgroundWithBlock(block: (Bool) -> Void) {
-        let session = NSURLSession.sharedSession()
-        let task = session.dataTaskWithURL(NSURL(string: "https://www.baidu.com/")!) { (data, response, error) in
+    var URLString: String
+    var observer: (ReachabilityCheckerStatus) -> Void
+    var task: NSURLSessionTask?
+    
+    var running: Bool {
+        return task != nil
+    }
+    
+    init(URLString: String, observer: (ReachabilityCheckerStatus) -> Void) {
+        self.URLString = URLString
+        self.observer = observer
+        
+        super.init()
+    }
+    
+    func start() {
+        task?.cancel()
+        
+        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+        configuration.timeoutIntervalForRequest = 5.0
+        let session = NSURLSession(configuration: configuration)
+        task = session.dataTaskWithURL(NSURL(string: URLString)!) { (data, response, error) in
             dispatch_async(dispatch_get_main_queue()) {
+                self.task = nil
+                
                 if (response as? NSHTTPURLResponse)?.statusCode == 200 {
-                    block(true)
+                    self.observer(.Succeed)
                 } else {
-                    block(false)
+                    self.observer(.Failed)
                 }
             }
         }
         
-        task.resume()
+        task?.resume()
+        
+        self.observer(.Pending)
+    }
+    
+    func stop() {
+        task?.cancel()
+        task = nil
+        
+        self.observer(.Cancelled)
     }
     
 }
