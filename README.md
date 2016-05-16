@@ -1,7 +1,7 @@
 [README in English](README-en.md)
 
 # MacReachability
----
+
 一个状态栏小工具，轻松检测你的网络状态。
 
 ## 前言
